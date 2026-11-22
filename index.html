@@ -114,7 +114,7 @@
   footer span:last-child{letter-spacing:0}
 
   /* tags */
-  .tag{position:fixed;left:0;top:0;z-index:3;pointer-events:none;display:flex;align-items:center;gap:8px;white-space:nowrap;transition:opacity .4s;will-change:transform}
+  .tag{position:fixed;left:0;top:0;z-index:3;pointer-events:none;display:flex;align-items:center;gap:8px;white-space:nowrap;transition:opacity .4s;will-change:transform;opacity:0}
   .tag .ln{width:34px;height:1px;background:var(--accent)}
   .tag .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(0,112,74,.18);animation:pulse 2s infinite}
   .tag .box{background:var(--tag);backdrop-filter:blur(6px);padding:7px 11px;border-left:2px solid var(--accent);display:flex;align-items:center;gap:9px}
@@ -1084,7 +1084,11 @@ function updateTags(e){
     t.el.classList.toggle('flip', flip);
     t.el.style.transform = `translate(${flip ? x - w + 5 : x - 5}px, ${y - 12}px)`;
     const id = t.el.id;
-    const vis = V.z < 1 && (id === 'tagHQ' ? (state.focus === 'all' || state.focus === 'slab' || state.focus === 'glass' || state.focus === 'hq')
+    // In the store close-up the HQ label is irrelevant, and on phones the store label
+    // would sit on top of the B1–B7 floor labels, so both stay hidden there.
+    const inStore = state.view === 'store';
+    const hideHere = inStore && (id === 'tagHQ' || (id === 'tagStore' && innerWidth < 700));
+    const vis = V.z < 1 && !hideHere && (id === 'tagHQ' ? (state.focus === 'all' || state.focus === 'slab' || state.focus === 'glass' || state.focus === 'hq')
       : id === 'tagStore' ? state.focus === 'all' : e < .3);
     t.el.style.opacity = vis ? 1 : 0;
     t.el.style.pointerEvents = vis && t.el.dataset.view ? 'auto' : 'none';
@@ -1261,6 +1265,14 @@ function tick(){
   }
   // keep the view centred higher as the building grows
   const kz = kOf(e, 0);
+  // Phones: the category list sits along the bottom once the building is pulled apart,
+  // so shift the rendered scene up (in screen pixels) as it spreads.
+  const lift = innerWidth < 700 && state.view === 'home' ? Math.round(kz * .12 * innerHeight) : 0;
+  if (lift !== tick.lift){
+    if (lift) camera.setViewOffset(innerWidth, innerHeight, 0, lift, innerWidth, innerHeight);
+    else camera.clearViewOffset();
+    tick.lift = lift;
+  }
   if (!camAnim && state.view === 'home'){
     controls.target.y += ((5.5 + 9*kz) - controls.target.y) * Math.min(1, dt*2);
     // ease the camera back as the building spreads, keeping the user's own zoom
@@ -1285,6 +1297,7 @@ function fit(){
   const k = a < 1 ? THREE.MathUtils.clamp(1.02 / a, 1, 2.7) : 1;
   if (k !== FIT.k){ camera.position.sub(controls.target).multiplyScalar(k / FIT.k).add(controls.target); FIT.k = k; }
   camera.updateProjectionMatrix();
+  tick.lift = undefined;   // re-apply the phone lift for the new screen size
 }
 addEventListener('resize', fit); fit();
 tick();
