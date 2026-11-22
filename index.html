@@ -1,0 +1,1244 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>새로운 시선 — 스타벅스 코리아 · 센터필드</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{
+    --bg:#eef0ec; --ink:#1f2a26; --ink-2:#56605b; --ink-3:#8b938e; --line:#d5d9d3;
+    --accent:#00704a; --accent-deep:#1e3932; --accent-soft:#d4e9e2; --panel:#f6f7f4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden}
+  #sky{position:fixed;inset:0;background:radial-gradient(120% 90% at 60% 35%,#1d2b36 0%,#111a21 55%,#080c0f 100%);opacity:0;transition:opacity 1.6s ease;pointer-events:none}
+  #sky i{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.5}
+  body.night #sky{opacity:1}
+  body{transition:color 1.2s}
+  body.night{--bg:#10171c;--ink:#e8eef0;--ink-2:#a6b3b8;--ink-3:#6c7a80;--line:#2b363b;--panel:#172127;--track:#36424a;--tag:rgba(18,26,31,.86);--store:#d6a57c}
+  body{--track:#c9cec8;--tag:rgba(255,255,255,.88);--store:#7a5333}
+  body{background:radial-gradient(120% 90% at 60% 40%,#f7f8f5 0%,var(--bg) 60%,#e4e7e2 100%);color:var(--ink);
+    font-family:Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;-webkit-font-smoothing:antialiased}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  #stage{position:fixed;inset:0}
+  #stage canvas{display:block;outline:none;cursor:grab}
+  header,.left,.cats,.caption,.tools,.bar,footer,.tag,.back,.menubtn{-webkit-user-select:none;user-select:none}
+  #stage canvas:active{cursor:grabbing}
+
+  /* header */
+  header{position:fixed;top:0;left:0;right:0;height:80px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;z-index:5;pointer-events:none}
+  header>*{pointer-events:auto}
+  .brand{display:flex;align-items:center;gap:12px}
+  .mark{width:42px;height:42px;display:block}
+  .brand b{font-size:19px;font-weight:700;letter-spacing:-.02em}
+  .brand small{display:block;font-size:11px;color:var(--ink-3);letter-spacing:.04em;font-weight:500;margin-top:1px}
+  .tagline{font-size:11px;letter-spacing:.42em;color:var(--ink-2);font-weight:500}
+  .info-btn{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500}
+  .info-btn i{width:20px;height:20px;border:1.4px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:700}
+
+  /* hero */
+  .left{position:fixed;left:50px;top:50%;transform:translateY(-58%);z-index:4;width:320px;transition:opacity .6s,transform .6s}
+  .hero h1{font-size:40px;line-height:1.3;font-weight:700;letter-spacing:-.03em}
+  .hero h1 span{font-weight:300;display:block}
+  .hero p{margin-top:26px;font-size:15px;line-height:1.8;color:var(--ink-2)}
+  .cta{margin-top:34px;display:inline-flex;align-items:center;justify-content:space-between;gap:40px;background:var(--accent);color:#fff;padding:0 20px;height:46px;min-width:160px;font-size:14px;font-weight:600;transition:background .25s}
+  .cta:hover{background:var(--accent-deep)}
+  .address{margin-top:56px;display:flex;gap:14px;align-items:flex-start}
+  .address:before{content:"";width:22px;height:1px;background:var(--ink-3);margin-top:9px}
+  .address b{font-size:13px;font-weight:600;display:block}
+  .address small{font-size:12px;color:var(--ink-3);display:block;margin-top:6px}
+  .hero.hide{opacity:0;pointer-events:none;transform:translateY(-54%)}
+  .tostore{display:flex;align-items:center;gap:10px;margin-top:18px;font-size:13px;font-weight:600;color:var(--store);padding:6px 0;border-bottom:1px solid currentColor;transition:gap .25s}
+  .tostore img{width:22px;height:22px}
+  .tostore:hover{gap:14px}
+  .back{position:fixed;left:40px;top:96px;transform:translateY(-8px);z-index:6;background:var(--ink);color:var(--bg);font-size:12.5px;font-weight:600;padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+  .back span{margin-right:6px}
+  body.closeup .back{opacity:1;pointer-events:auto;transform:none}
+  body.closeup .hero{opacity:0;pointer-events:none}
+  body.closeup .hint{opacity:0}
+
+  .cats{position:fixed;left:50px;top:50%;transform:translateY(-50%);z-index:4;width:150px;opacity:0;pointer-events:none;transition:opacity .6s}
+  .cats.show{opacity:1;pointer-events:auto}
+  .cats button{display:block;width:100%;text-align:left;padding:11px 0;font-size:13.5px;color:var(--ink-2);transition:color .2s,padding .2s}
+  .cats button:hover{color:var(--ink);padding-left:4px}
+  .cats button.on{color:var(--accent);font-weight:700}
+  .cats button.all{margin-top:14px;border-top:1px solid var(--line);padding-top:16px}
+  .cats button.all.on{border-bottom:2px solid var(--accent)}
+  .cats button i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:10px;vertical-align:1px}
+
+  /* caption top right */
+  .caption{position:fixed;right:50px;top:104px;z-index:4;text-align:right}
+  .caption b{font-size:14px;font-weight:700;display:block;transition:opacity .35s}
+  .caption small{font-size:12px;color:var(--ink-2);display:block;margin-top:8px;transition:opacity .35s}
+
+  /* right tools */
+  .tools{position:fixed;right:30px;top:50%;transform:translateY(-40%);z-index:4;display:flex;flex-direction:column;align-items:center;gap:6px}
+  .tools button{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;transition:background .2s}
+  .tools button:hover{background:rgba(0,0,0,.05)}
+  .tools button.on{color:var(--accent)}
+  .tools hr{width:18px;border:0;border-top:1px solid var(--line);margin:4px 0}
+  .tools svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+  .hint{position:fixed;left:50%;bottom:150px;transform:translateX(-50%);z-index:3;font-size:12px;color:var(--ink-2);display:flex;gap:8px;align-items:center;transition:opacity .6s;pointer-events:none}
+  .hint svg{width:13px;height:16px;stroke:var(--ink-2);fill:none;stroke-width:1.4}
+
+  /* bottom bar */
+  .bar{position:fixed;left:30px;right:30px;bottom:44px;height:96px;border-top:1px solid var(--line);z-index:5;display:grid;grid-template-columns:1fr minmax(240px,260px) 1fr;align-items:center;gap:24px;padding:0 2px}
+  .tabs{display:flex;gap:22px}
+  .tabs button{font-size:13.5px;color:var(--ink-2);padding:8px 0 10px;border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
+  .tabs button em{font-style:normal;font-size:11px;margin-right:7px;color:var(--ink-3)}
+  .tabs button.on{color:var(--accent);font-weight:700;border-color:var(--accent)}
+  .tabs button.on em{color:var(--accent)}
+  .slider .top{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;font-weight:600}
+  .slider .top output{font-size:17px;font-weight:500;font-variant-numeric:tabular-nums}
+  .slider .top output small{font-size:10px;margin-left:4px;color:var(--ink-3)}
+  .slider .ends{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-3);margin-top:4px}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:20px;background:transparent;margin-top:6px;--p:0%}
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:linear-gradient(90deg,var(--accent) var(--p),var(--track) var(--p))}
+  input[type=range]::-moz-range-track{height:2px;background:linear-gradient(90deg,var(--accent) var(--p),var(--track) var(--p))}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;border:4px solid var(--accent);margin-top:-6px;box-shadow:0 0 0 3px rgba(0,112,74,.12)}
+  input[type=range]::-moz-range-thumb{width:8px;height:8px;border-radius:50%;background:#fff;border:4px solid var(--accent)}
+  .play{justify-self:end;display:flex;align-items:center;gap:14px;text-align:left}
+  .play .ring{width:40px;height:40px;position:relative}
+  .play .ring svg{position:absolute;inset:0;width:40px;height:40px}
+  .play .ring circle{fill:none;stroke-width:1.2}
+  .play .ring .bgc{stroke:var(--ink-2)}
+  .play .ring .fg{stroke:var(--accent);stroke-width:2;stroke-dasharray:119.4;stroke-dashoffset:119.4;transform:rotate(-90deg);transform-origin:50% 50%}
+  .play .ring .ico{position:absolute;inset:0;display:grid;place-items:center}
+  .play .ring .ico svg{position:static;width:14px;height:14px;fill:var(--ink);stroke:none}
+  .play b{font-size:13.5px;font-weight:600;display:block}
+  .play small{font-size:11px;color:var(--ink-3);display:block;margin-top:4px}
+
+  footer{position:fixed;left:32px;right:32px;bottom:14px;display:flex;justify-content:space-between;font-size:10px;letter-spacing:.06em;color:var(--ink-2);z-index:5}
+  footer span:last-child{letter-spacing:0}
+
+  /* tags */
+  .tag{position:fixed;left:0;top:0;z-index:3;pointer-events:none;display:flex;align-items:center;gap:8px;white-space:nowrap;transition:opacity .4s;will-change:transform}
+  .tag .ln{width:34px;height:1px;background:var(--accent)}
+  .tag .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(0,112,74,.18);animation:pulse 2s infinite}
+  .tag .box{background:var(--tag);backdrop-filter:blur(6px);padding:7px 11px;border-left:2px solid var(--accent);display:flex;align-items:center;gap:9px}
+  .tag .box img{width:26px;height:26px}
+  .tag[data-view] .box{cursor:pointer;transition:transform .2s,box-shadow .2s}
+  .tag[data-view] .box:hover{transform:translateX(3px);box-shadow:0 6px 18px rgba(0,0,0,.1)}
+  .tag.active .box{background:var(--panel);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .tag.flip{flex-direction:row-reverse}
+  .tag.flip .box{border-left:0;border-right:2px solid var(--accent)}
+  .tag.store .box{border-left-color:#a8714a}
+  .tag.store.flip .box{border-right-color:#a8714a}
+  .tag.store .ln{background:#a8714a}
+  .tag.store .dot{background:#a8714a;box-shadow:0 0 0 4px rgba(168,113,74,.2)}
+  .tag b{font-size:12px;display:block}
+  .tag small{font-size:10.5px;color:var(--ink-2)}
+  .tag.mini .box{border-left-color:var(--ink-3);padding:4px 8px}
+  .tag.mini b{font-size:10.5px;font-weight:600;color:var(--ink-2)}
+  .tag.mini .ln{background:var(--ink-3);width:20px}
+  @keyframes pulse{50%{box-shadow:0 0 0 8px rgba(0,112,74,0)}}
+
+  /* loader */
+  #loader{position:fixed;inset:0;display:grid;place-items:center;z-index:9;pointer-events:none;transition:opacity .9s}
+  #loader div{display:flex;gap:12px;align-items:center;font-size:13px;color:var(--ink-2)}
+  #loader i{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* modal */
+  .modal{position:fixed;inset:0;z-index:20;background:rgba(40,48,44,.45);backdrop-filter:blur(4px);display:grid;place-items:center;opacity:0;pointer-events:none;transition:opacity .35s;padding:16px}
+  .modal.open{opacity:1;pointer-events:auto}
+  .sheet{background:var(--panel);width:min(410px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:44px 38px 38px;position:relative;transform:translateY(12px);transition:transform .35s}
+  .modal.open .sheet{transform:none}
+  .sheet .x{position:absolute;right:20px;top:18px;font-size:22px;font-weight:300;width:32px;height:32px}
+  .sheet h2{font-size:21px;line-height:1.5;font-weight:700;letter-spacing:-.02em}
+  .sheet p{font-size:12.5px;line-height:1.85;color:var(--ink-2);margin-top:16px}
+  .sheet hr{border:0;border-top:1px solid var(--line);margin:26px 0 20px}
+  .sheet h3{font-size:12.5px;margin:18px 0 8px}
+  .sheet .small{font-size:11px;line-height:1.9;color:var(--ink-2);margin-top:0}
+  .sheet a{color:var(--ink);font-size:12px;font-weight:600;display:inline-block;margin-top:14px;border-bottom:1px solid var(--ink);text-decoration:none}
+
+
+  /* new-menu panel (store close-up) */
+  .menu{position:fixed;right:24px;top:148px;bottom:152px;width:330px;z-index:7;background:var(--panel);border:1px solid var(--line);
+    box-shadow:0 18px 50px rgba(0,0,0,.14);display:flex;flex-direction:column;transform:translateX(calc(100% + 40px));opacity:0;transition:transform .55s cubic-bezier(.2,.8,.2,1),opacity .4s}
+  body.menu-open .menu{transform:none;opacity:1}
+  body.menu-open .tools{right:372px}
+  body.menu-open .caption{right:372px}
+  .menu .mhead{display:flex;gap:12px;align-items:center;padding:18px 18px 12px;border-bottom:1px solid var(--line)}
+  .menu .mhead img{width:34px;height:34px}
+  .menu .mhead small{display:block;font-size:10px;letter-spacing:.16em;color:var(--accent);font-weight:700}
+  .menu .mhead b{display:block;font-size:15.5px;margin-top:3px}
+  .menu .mx{margin-left:auto;font-size:22px;font-weight:300;width:30px;height:30px;color:var(--ink-2)}
+  .menu .msub{font-size:11px;color:var(--ink-3);padding:10px 18px 4px}
+  .menu ul{list-style:none;overflow:auto;padding:4px 10px 8px;flex:1}
+  .menu li{display:grid;grid-template-columns:44px 1fr;gap:12px;padding:11px 8px;border-bottom:1px dashed var(--line);
+    opacity:0;transform:translateY(8px);transition:opacity .45s,transform .45s}
+  body.menu-open .menu li{opacity:1;transform:none}
+  .menu li svg{width:44px;height:56px}
+  .menu li b{font-size:13.5px;display:block;line-height:1.35}
+  .menu li i{font-style:normal;font-size:10px;color:var(--ink-3);display:block;margin-top:1px}
+  .menu li p{font-size:11.5px;color:var(--ink-2);line-height:1.6;margin-top:5px}
+  .menu li .chips{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+  .menu li .chips span{font-size:9.5px;font-weight:700;letter-spacing:.04em;padding:2px 6px;border:1px solid var(--line);color:var(--ink-2)}
+  .menu li .chips .new{background:var(--accent);border-color:var(--accent);color:#fff}
+  .menu li .chips .ret{border-color:#a8714a;color:#a8714a}
+  .menu .mfoot{padding:12px 18px 16px;border-top:1px solid var(--line);font-size:11px;color:var(--ink-2);line-height:1.7}
+  .menu .mfoot b{display:block;font-size:11.5px;color:var(--ink);margin-bottom:4px}
+  .menu .mfoot a{display:inline-block;margin-top:8px;color:var(--accent);font-weight:700;text-decoration:none}
+  .menubtn{position:fixed;left:150px;top:96px;z-index:6;font-size:12.5px;font-weight:600;padding:10px 16px;border-radius:999px;background:var(--accent);color:#fff;
+    opacity:0;pointer-events:none;transform:translateY(-8px);transition:opacity .35s,transform .35s;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+  body.view-store .menubtn{opacity:1;pointer-events:auto;transform:none}
+  body.night .menu{box-shadow:0 18px 50px rgba(0,0,0,.5)}
+  @media (max-width:900px){
+    /* phone: the menu becomes a swipeable card strip above the bottom bar */
+    .menu{left:10px;right:10px;width:auto;top:auto;bottom:150px;max-height:none}
+    .menu .mhead{padding:10px 12px 8px}
+    .menu .mhead img{width:26px;height:26px}
+    .menu .mhead b{font-size:13.5px}
+    .menu .msub,.menu .mfoot{display:none}
+    .menu ul{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 10px 10px;-webkit-overflow-scrolling:touch}
+    .menu li{flex:0 0 78%;scroll-snap-align:start;border:1px solid var(--line);padding:10px;grid-template-columns:36px 1fr;gap:10px}
+    .menu li svg{width:36px;height:46px}
+    .menu li p{font-size:11px;line-height:1.5;margin-top:3px}
+    body.menu-open .tools,body.menu-open .caption{right:10px}
+    .menubtn{left:auto;right:16px;top:70px}
+  }
+
+  @media (max-width:900px){
+    header{padding:0 18px;height:64px}
+    .tagline{display:none}
+    .left,.cats{left:18px}
+    .hero h1{font-size:23px;line-height:1.25}
+    .hero h1 span{display:inline;margin-left:6px}
+    .hero p,.address{display:none}
+    .left{top:74px;transform:none;width:auto;right:18px}
+    .cta{height:36px;min-width:0;gap:14px;font-size:12.5px;margin-top:12px;padding:0 14px}
+    .tostore{margin-top:6px;font-size:12px;display:inline-flex}
+    .tostore img{width:18px;height:18px}
+    .tag .box{padding:5px 8px;gap:7px}
+    .tag b{font-size:11px}.tag small{font-size:9.5px}
+    .tag .box img{width:20px;height:20px}
+    .tag .ln{width:16px}
+    .tag.mini{display:none}
+    .tag.lv{display:flex}
+    body.closeup .caption{display:none}
+    .back{left:16px;top:72px}
+    .hero.hide{transform:none}
+    .cats{top:auto;bottom:220px;transform:none;display:flex;flex-wrap:wrap;width:auto;right:18px;gap:4px 14px}
+    .cats button{width:auto;padding:4px 0;font-size:12px}
+    .cats button.all{margin:0;border:0;padding:4px 0}
+    .caption{right:18px;top:76px}
+    .caption small{display:none}
+    .tools{right:10px}
+    .bar{left:16px;right:16px;bottom:34px;height:auto;padding:12px 0;grid-template-columns:1fr auto;grid-template-areas:"s s" "t p";gap:12px}
+    .slider{grid-area:s}.tabs{grid-area:t;gap:12px}.play{grid-area:p}
+    .tabs button{white-space:nowrap;font-size:12.5px}
+    .play b{font-size:12.5px}
+    .play small{display:none}
+    .hint{display:none}
+    footer{left:16px;right:16px;bottom:10px}
+    footer span:last-child{display:none}
+  }
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+</head>
+<body class="night">
+<div id="sky"></div>
+<div id="stage"></div>
+<div id="loader"><div><i></i>공간에 커피 향을 채우는 중</div></div>
+
+<header>
+  <div class="brand">
+    <img class="mark" src="assets/logo-star.svg" alt="">
+    <div><b>센터필드 이스트</b><small>UNOFFICIAL TOUR · 스타벅스 코리아 20–22F</small></div>
+  </div>
+  <div class="tagline">A NEW PERSPECTIVE</div>
+  <button class="info-btn" id="openInfo"><i>i</i>프로젝트 소개</button>
+</header>
+
+<section class="left hero" id="hero">
+  <h1>익숙한 한 잔,<span>새로운 시선.</span></h1>
+  <p>매일 커피를 내리는 사람들의 공간을<br>한 겹 더 깊이 들여다봅니다.</p>
+  <button class="cta" id="cta">건축의 안쪽으로 <span>↗</span></button>
+  <button class="tostore" id="toStore"><img src="assets/logo-star-copper.svg" alt="">B1 리저브 매장 들여다보기 <span>→</span></button>
+  <div class="address"><div><b>센터필드 이스트</b><small>서울 강남구 테헤란로 231</small></div></div>
+</section>
+
+<button class="menubtn" id="menuBtn">☕ 신메뉴 보기</button>
+<aside class="menu" id="menu" aria-label="스타벅스 최신 출시 메뉴">
+  <div class="mhead"><img src="assets/logo-star.svg" alt=""><div><small>NEW · STARBUCKS KOREA</small><b>2026 크리스마스 시즌 음료</b></div><button class="mx" id="menuX" aria-label="닫기">×</button></div>
+  <div class="msub">센터필드R점에서 만나는 최신 출시 메뉴 · 칼로리는 Tall(12oz) 기준</div>
+  <ul id="menuList"></ul>
+  <div class="mfoot"><b>함께 출시된 상품</b>11.19 헬로키티 Ph1 MD · 11.12 커피 데이백 아메리카노<br>10.29 더블 치즈 케이크 · 코어 홀케이크 4종 · 크리스마스 홀케이크 사전 예약 중
+    <br><a href="https://www.starbucks.co.kr/menu/drink_list.do" target="_blank" rel="noopener">공식 메뉴 전체 보기 ↗</a><br><span style="color:var(--ink-3)">2026.11.22 스타벅스 코리아 공식 홈페이지 기준 · 가격·판매 여부는 매장마다 다를 수 있습니다</span></div>
+</aside>
+<button class="back" id="back"><span>←</span> 전체 보기</button>
+
+<nav class="cats" id="cats">
+  <button data-f="glass"><i style="background:#8fa9b8"></i>유리·프레임</button>
+  <button data-f="struct"><i style="background:#7d878c"></i>구조 프레임</button>
+  <button data-f="slab"><i style="background:#e07a3a"></i>층판·배관</button>
+  <button data-f="lift"><i style="background:#00704a"></i>승강기</button>
+  <button data-f="stair"><i style="background:#c8a777"></i>계단</button>
+  <button data-f="mep"><i style="background:#6b7680"></i>팬·설비</button>
+  <button data-f="all" class="all on">전체 보기</button>
+</nav>
+
+<div class="caption"><b id="capT">외관의 리듬</b><small id="capS">센터필드 · 사선으로 놓인 두 개의 탑</small></div>
+
+<div class="tools">
+  <button id="tNight" title="낮 / 밤 전환"><svg viewBox="0 0 24 24" id="nightIco"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
+  <hr>
+  <button id="tRotate" title="자동 회전"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="4.5"/><path d="M12 7.5v9"/><path d="M18.5 15.5l2 .5-.5 2"/></svg></button>
+  <button id="tIn" title="확대"><svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg></button>
+  <button id="tOut" title="축소"><svg viewBox="0 0 24 24"><path d="M6 12h12"/></svg></button>
+  <hr>
+  <button id="tReset" title="처음으로"><svg viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v3.5H8"/></svg></button>
+  <button id="tFull" title="전체 화면"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button>
+</div>
+
+<div class="hint" id="hint"><svg viewBox="0 0 14 18"><rect x="1" y="1" width="12" height="16" rx="6"/><path d="M7 4v3"/></svg>드래그하여 회전 · 휠로 확대</div>
+
+<div class="tag" id="tagHQ" data-view="hq" title="20–22F 가까이 보기"><span class="dot"></span><span class="ln"></span><div class="box"><img src="assets/logo-star.svg" alt=""><div><b>스타벅스 코리아</b><small>이스트 타워 20–22F · 가까이 보기 ↗</small></div></div></div>
+<div class="tag store" id="tagStore" data-view="store" title="매장 들여다보기"><span class="dot"></span><span class="ln"></span><div class="box"><img src="assets/logo-star-copper.svg" alt=""><div><b>스타벅스 센터필드R점</b><small>이스트 타워 B1 · 들여다보기 ↗</small></div></div></div>
+<div class="tag mini" id="tagW"><span class="ln"></span><div class="box"><b>WEST · 36F</b></div></div>
+<div class="tag mini lv" id="lvB1"><span class="ln"></span><div class="box"><b>B1 · 스타벅스 센터필드R점 · 더 샵스 앳 센터필드</b></div></div>
+<div class="tag mini lv" id="lvP"><span class="ln"></span><div class="box"><b>B2–B6 · 주차장</b></div></div>
+<div class="tag mini lv" id="lvB7"><span class="ln"></span><div class="box"><b>B7 · 기계실 · 저수조</b></div></div>
+<div class="tag mini" id="tagE"><span class="ln"></span><div class="box"><b>EAST · 35F</b></div></div>
+
+<div class="bar">
+  <div class="tabs" id="tabs">
+    <button data-t="0" class="on"><em>01</em>외관</button>
+    <button data-t="0.55"><em>02</em>펼치다</button>
+    <button data-t="1"><em>03</em>디테일</button>
+  </div>
+  <div class="slider">
+    <div class="top"><span>건물 펼치기</span><output id="pct">0<small>%</small></output></div>
+    <input type="range" id="range" min="0" max="100" value="0" step="0.1" aria-label="건물 펼치기">
+    <div class="ends"><span>하나의 공간</span><span>부품의 세계</span></div>
+  </div>
+  <button class="play" id="play">
+    <div class="ring"><svg viewBox="0 0 40 40"><circle class="bgc" cx="20" cy="20" r="19"/><circle class="fg" id="ringFg" cx="20" cy="20" r="19"/></svg><div class="ico" id="playIco"><svg viewBox="0 0 14 14"><path d="M3 1.5v11l9.5-5.5z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></div></div>
+    <div><b id="playT">자동으로 둘러보기</b><small>36초의 새로운 발견</small></div>
+  </button>
+</div>
+
+<footer><span>UNOFFICIAL · ARCHITECTURAL EXPERIENCE</span><span id="foot">공개 사진과 기사를 바탕으로 재구성한 건축 시각화</span></footer>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <button class="x" id="closeInfo" aria-label="닫기">×</button>
+    <h2>매일의 한 잔이 시작되는 곳을,<br>다시 발견하는 순간.</h2>
+    <p>스타벅스 코리아(SCK컴퍼니)가 자리한 센터필드 이스트 타워의 인터랙티브 건축 경험입니다. 옛 르네상스호텔 부지에 사선으로 마주 선 두 개의 타워, 세 개의 면으로 나뉜 청회색 커튼월과 수직 핀, 유리 로비와 금빛 캐노피, 그리고 이스트 타워 지하 1층의 스타벅스 센터필드R점을 웹 3D로 재구성했습니다.</p>
+    <p>슬라이더로 건물을 펼친 뒤 유리·프레임, 구조 프레임, 층판·배관, 승강기, 계단, 팬·설비를 골라 가까이 볼 수 있습니다. 건물을 직접 드래그해 모든 방향에서 살펴보세요. 마우스 휠이나 두 손가락으로 확대할 수 있습니다. 자동 시연은 36초 동안 외관, 펼침, 디테일, 재조립을 이어 보여줍니다.</p>
+    <hr>
+    <h3>시각화 안내</h3>
+    <p class="small">실측·설계 도면에 기반한 디지털 트윈이 아닙니다. 내부의 승강기·계단·배관과 분해 동작은 전시를 위해 창작한 것으로, 실제 건물의 구조나 설비 배치를 나타내지 않습니다. 스타벅스 또는 SCK컴퍼니의 공식 홈페이지가 아닌 비공식 전시용 프로젝트입니다.</p>
+    <h3>자료와 빛</h3>
+    <p class="small">건물 개요: 센터필드 (웨스트 36F · 이스트 35F, 최고 약 158m, 2020년 준공)<br>스타벅스 코리아: 테헤란로 231 센터필드 이스트 20–22층 (2025년 5월 이전)<br>매장: 스타벅스 센터필드R점 · 이스트 타워 B1 (매장 사진 참고 재구성)<br>로고: 상표 로고 대신 직접 그린 도트 별 기호를 사용했습니다<br>환경광: three.js RoomEnvironment<br>서체: Pretendard · SIL Open Font License</p>
+    <a href="https://wiki.onul.works/w/%EC%84%BC%ED%84%B0%ED%95%84%EB%93%9C" target="_blank" rel="noopener">건물 참고 자료 보기 ↗</a>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+/* ---------- renderer / scene ---------- */
+const stage = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.localClippingEnabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+stage.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+
+const camera = new THREE.PerspectiveCamera(32, innerWidth/innerHeight, 0.5, 600);
+const HOME = { pos:new THREE.Vector3(40, 30, 57), target:new THREE.Vector3(-2, 5.5, 3) };
+// narrow (portrait) screens need the camera further back to fit both towers
+const FIT = { k:1 };
+const fitPos = (pos, target) => target.clone().add(pos.clone().sub(target).multiplyScalar(FIT.k));
+camera.position.copy(HOME.pos);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.copy(HOME.target);
+controls.enableDamping = true; controls.dampingFactor = 0.06;
+controls.minDistance = 6; controls.maxDistance = 150;
+controls.maxPolarAngle = 1.48; controls.enablePan = false;
+controls.autoRotateSpeed = 0.9;
+
+const hemi = new THREE.HemisphereLight(0xffffff, 0xd9ddd5, 1.15); scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xfff6ea, 1.9);
+sun.position.set(-30, 60, 34);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left:-48, right:48, top:48, bottom:-48, near:1, far:160 });
+sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03;
+scene.add(sun);
+
+const shadowPlane = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.ShadowMaterial({ opacity:0.13 }));
+shadowPlane.rotation.x = -Math.PI/2; shadowPlane.position.y = -0.62; shadowPlane.receiveShadow = true;
+scene.add(shadowPlane);
+
+/* ---------- helpers ---------- */
+const clamp01 = v => Math.min(1, Math.max(0, v));
+const ease = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
+const MAXD = 0.35;
+const kOf = (e, d) => ease(clamp01((e - d) / (1 - MAXD)));
+const BOX = new THREE.BoxGeometry(1, 1, 1);
+const CYL = new THREE.CylinderGeometry(1, 1, 1, 14);
+
+// Materials grouped by category so we can focus one at a time.
+const CAT = { glass:[], struct:[], slab:[], lift:[], stair:[], mep:[] };
+function mat(cat, params, Kind = THREE.MeshStandardMaterial){
+  // Only category materials (they fade) and see-through ones need blending; making every material
+  // transparent made the renderer re-sort objects each frame, so things behind glass flickered.
+  const seeThrough = params.opacity !== undefined && params.opacity < 1;
+  const m = new Kind({ transparent: !!cat || seeThrough, depthWrite: !seeThrough, ...params });
+  m.userData.base = m.opacity; m.userData.seeThrough = seeThrough;
+  if (cat) CAT[cat].push(m);
+  return m;
+}
+const M = {
+  glass: mat('glass', { color:0x5d7889, metalness:0.65, roughness:0.05, envMapIntensity:1.5 }, THREE.MeshPhysicalMaterial),
+  frame: mat('glass', { color:0xb9c3c9, metalness:0.5, roughness:0.35 }),
+  slab:  mat('slab',  { color:0xeceeea, roughness:0.85 }),
+  pipe:  mat('slab',  { color:0xffffff, roughness:0.4, metalness:0.3 }),
+  post:  mat('lift',  { color:0x34403c, roughness:0.5, metalness:0.5 }),
+  plate: mat('lift',  { color:0x7fb59f, roughness:0.6, opacity:0.35 }),
+  car:   mat('lift',  { color:0xffffff, roughness:0.35, metalness:0.2 }),
+  stair: mat('stair', { color:0xd2b88f, roughness:0.7 }),
+  mep:   mat('mep',   { color:0x8b959c, roughness:0.45, metalness:0.55 }),
+  fan:   mat('mep',   { color:0x2c3438, roughness:0.4, metalness:0.6 }),
+  fin:   mat('glass', { color:0xc9d2d7, metalness:0.8, roughness:0.22 }),
+  struct:mat('struct',{ color:0x86919a, roughness:0.5, metalness:0.45 }),
+  core:  mat('struct',{ color:0xd6d8d3, roughness:0.9, opacity:0.95 }),
+  desk:  mat('slab',  { color:0xc9a27a, roughness:0.6 }),
+  chair: mat('slab',  { color:0x00704a, roughness:0.6 }),
+  plaza: mat(null, { color:0xf1f1ec, roughness:0.95 }),
+  white: mat(null, { color:0xfbfbf9, roughness:0.6 }),
+  tree:  mat(null, { color:0x8aa190, roughness:0.9, flatShading:true }),
+  trunk: mat(null, { color:0x857664, roughness:0.9 }),
+  // lobby + Reserve store palette (from store photos: bronze walls, gold ceiling, caramel leather, walnut, marble)
+  lobby: mat(null, { color:0xd5e4e8, metalness:0.3, roughness:0.04, opacity:0.4 }, THREE.MeshPhysicalMaterial),
+  dark:  mat(null, { color:0x2c3135, roughness:0.5, metalness:0.4 }),
+  led:   mat(null, { color:0xffd58a }, THREE.MeshBasicMaterial),
+  gold:  mat(null, { color:0xc9a24e, metalness:0.9, roughness:0.28, emissive:0x3a2a10, emissiveIntensity:0.6 }),
+  bronze:mat(null, { color:0x9b7149, metalness:0.85, roughness:0.36 }),
+  leather:mat(null,{ color:0xa45e2e, roughness:0.55 }),
+  walnut:mat(null, { color:0x5c3b26, roughness:0.6 }),
+  marble:mat(null, { color:0xf2efe9, roughness:0.18 }),
+  stone: mat(null, { color:0xd8d2c7, roughness:0.75 }),
+  black: mat(null, { color:0x1c1e1f, roughness:0.3, metalness:0.5 }),
+  rail:  mat(null, { color:0xdff0f1, metalness:0.2, roughness:0.05, opacity:0.32 }, THREE.MeshPhysicalMaterial),
+  bulb:  mat(null, { color:0xffe2b0, emissive:0xffc46b, emissiveIntensity:1.6 }),
+  win:   new THREE.MeshBasicMaterial({ color:0xffffff, transparent:true, opacity:0, depthWrite:false, toneMapped:false }),
+  red:   new THREE.MeshBasicMaterial({ color:0xff3b30, transparent:true, opacity:0, toneMapped:false }),
+};
+// logo textures (SVG → canvas so they stay crisp)
+function svgTexture(url, size = 512){
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  const img = new Image();
+  img.onload = () => { c.getContext('2d').drawImage(img, 0, 0, size, size); t.needsUpdate = true; };
+  img.src = url; return t;
+}
+const TEX = { siren:svgTexture('assets/logo-star.svg'), reserve:svgTexture('assets/logo-star-copper.svg') };   // original dot-star marks, not trademarks
+function textTexture(lines, w = 1024, h = 128){
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d'); x.fillStyle = '#2c3135'; x.fillRect(0, 0, w, h);
+  x.fillStyle = '#f4f1ea'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.font = '500 64px Pretendard, Arial'; x.letterSpacing = '18px'; x.fillText(lines[0], w/2, h*.42);
+  x.font = '500 24px Pretendard, Arial'; x.letterSpacing = '8px'; x.fillText(lines[1], w/2, h*.84);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+}
+
+// Instanced parts with per-instance explode offset + delay
+class Parts {
+  constructor(geo, material, { colors=false, shadow=true } = {}){ this.geo = geo; this.mat = material; this.items = []; this.colors = colors; this.shadow = shadow; }
+  add(pos, scale, off, delay=0, ry=0, rx=0, rz=0, color){
+    this.items.push({ pos, scale, off, delay, q:new THREE.Quaternion().setFromEuler(new THREE.Euler(rx, ry, rz)), color });
+  }
+  build(parent){
+    const m = this.mesh = new THREE.InstancedMesh(this.geo, this.mat, this.items.length);
+    m.castShadow = m.receiveShadow = this.shadow; m.frustumCulled = false;
+    if (this.colors) this.items.forEach((it,i) => m.setColorAt(i, it.color || new THREE.Color(1,1,1)));
+    parent.add(m); this.update(0); return this;
+  }
+  update(e){
+    const p = new THREE.Vector3(), mx = new THREE.Matrix4();
+    this.items.forEach((it,i) => {
+      p.copy(it.pos).addScaledVector(it.off, kOf(e, it.delay));
+      if (it.hq) p.y += it.hq * HQ.k;
+      mx.compose(p, it.q, it.scale); this.mesh.setMatrixAt(i, mx);
+    });
+    this.mesh.instanceMatrix.needsUpdate = true;
+  }
+}
+const explodables = [];
+const HQ = { h:0, k:0, lift:7 };   // 'lid off' lift for the floors above 22F in the HQ close-up   // {obj, base, off, delay}
+function track(obj, off, delay=0){ explodables.push({ obj, base:obj.position.clone(), off, delay }); return obj; }
+const allParts = [];
+
+/* ---------- tower ---------- */
+const FH = 0.62, SP = 0.28;         // floor height, vertical spread when exploded
+const W = 5, D = 3.4, C = 1.25;      // half width, half depth, chamfer
+const v3 = (x,y,z) => new THREE.Vector3(x,y,z);
+const V = new THREE.Vector3();
+
+function footprint(w, d, c){
+  return [[w-c,-d],[w,-d+c],[w,d-c],[w-c,d],[-w+c,d],[-w,d-c],[-w,-d+c],[-w+c,-d]];
+}
+function edgesOf(pts){
+  return pts.map((a,i) => {
+    const b = pts[(i+1)%pts.length];
+    const A = v3(a[0],0,a[1]), B = v3(b[0],0,b[1]);
+    const dir = B.clone().sub(A); const len = dir.length(); dir.normalize();
+    const n = v3(dir.z, 0, -dir.x);
+    const mid = A.clone().add(B).multiplyScalar(.5);
+    if (n.dot(mid) < 0) n.negate();
+    // three façade segments: split by facing direction
+    const seg = ((Math.floor(((Math.atan2(n.z, n.x) + Math.PI) / (Math.PI*2)) * 3 + 0.25)) % 3 + 3) % 3;
+    return { A, B, dir, len, n, mid, seg, ry:-Math.atan2(dir.z, dir.x) };
+  });
+}
+
+function buildTower({ floors, hq = [], name }){
+  const g = new THREE.Group();
+  const H = floors * FH;
+  const edges = edgesOf(footprint(W, D, C));
+  const glass = new Parts(BOX, M.glass, { colors:true });
+  const frame = new Parts(BOX, M.frame);
+  const lit = new Parts(BOX, M.win, { colors:true, shadow:false });
+  const fins = new Parts(BOX, M.fin);
+  const struct = new Parts(BOX, M.struct), core = new Parts(BOX, M.core);
+  const desks = new Parts(BOX, M.desk), chairs = new Parts(BOX, M.chair);
+  const slabs = new Parts(null, M.slab, { colors:true });
+  const posts = new Parts(BOX, M.post), plates = new Parts(BOX, M.plate);
+  const stairs = new Parts(BOX, M.stair);
+  const pipes = new Parts(CYL, M.pipe, { colors:true });
+  const hqTint = new THREE.Color(0.55, 1.18, 0.82), lobby = new THREE.Color(0.72, 0.78, 0.8);
+
+  for (let f = 0; f < floors; f++){
+    const y0 = f*FH, up = f*FH*SP;
+    const isHQ = hq.includes(f+1);
+    const dl = 0.3 * (1 - f/floors);
+    const occ = .25 + Math.random() * .5;   // how busy this floor is tonight
+    edges.forEach(E => {
+      const n = Math.max(1, Math.round(E.len / 1.1));
+      const pw = E.len / n;
+      const outG = 3.6 + E.seg*2.2, outF = 2.2 + E.seg*1.6;
+      for (let j = 0; j < n; j++){
+        const P = E.A.clone().addScaledVector(E.dir, (j+.5)*pw);
+        const tint = f === 0 ? lobby : isHQ ? hqTint : new THREE.Color().setScalar(0.94 + Math.random()*0.1);
+        glass.add(v3(P.x, y0 + FH/2 + .04, P.z), v3(pw - .05, FH - .13, .05),
+          E.n.clone().multiplyScalar(outG).setY(up), dl + E.seg*.015, E.ry, 0, 0, tint);
+        // night: lit window just outside the glass (office floors mostly lit, Starbucks floors fully lit)
+        if (f === 0 || isHQ || Math.random() < occ){
+          const W2 = P.clone().addScaledVector(E.n, .035);
+          const c = isHQ ? new THREE.Color(.35, 1, .62) : f === 0 ? new THREE.Color(1, .82, .55)
+            : Math.random() < .7 ? new THREE.Color(1, .88, .66).multiplyScalar(.75 + Math.random()*.35) : new THREE.Color(.85, .93, 1).multiplyScalar(.7 + Math.random()*.3);
+          lit.add(v3(W2.x, y0 + FH/2 + .04, W2.z), v3(pw - .12, FH - .22, .01),
+            E.n.clone().multiplyScalar(outG).setY(up), dl + E.seg*.015, E.ry, 0, 0, c);
+        }
+        // mullions: every third one is a deep vertical fin (the tower's vertical rhythm)
+        const big = j % 3 === 0;
+        const Q = E.A.clone().addScaledVector(E.dir, j*pw).addScaledVector(E.n, big ? .2 : .07);
+        (big ? fins : frame).add(v3(Q.x, y0 + FH/2, Q.z), big ? v3(.08, FH, .42) : v3(.045, FH, .14),
+          E.n.clone().multiplyScalar(big ? outF + .9 : outF).setY(up), dl, E.ry);
+      }
+      const S = E.mid.clone().addScaledVector(E.n, .05);
+      const offF = E.n.clone().multiplyScalar(outF).setY(up);
+      frame.add(v3(S.x, y0 + .03, S.z), v3(E.len + .02, .14, .16), offF, dl, E.ry);        // spandrel band
+      frame.add(v3(S.x, y0 + FH*.74, S.z), v3(E.len, .025, .08), offF, dl, E.ry);         // transom
+      // corner pilaster at each vertex
+      const K = E.A.clone().addScaledVector(E.n, .1);
+      fins.add(v3(K.x, y0 + FH/2, K.z), v3(.2, FH, .2), E.n.clone().multiplyScalar(outF + .9).setY(up), dl, E.ry);
+
+      // structure: perimeter columns + edge beam, set back from the glass
+      const inset = E.n.clone().multiplyScalar(-.5);
+      const offS = E.n.clone().multiplyScalar(1 + E.seg*.5).setY(up);
+      const nc = Math.max(1, Math.round(E.len / 2.1));
+      for (let j = 0; j < nc; j++){
+        const P = E.A.clone().addScaledVector(E.dir, j*E.len/nc).add(inset);
+        struct.add(v3(P.x, y0 + FH/2, P.z), v3(.26, FH, .26), offS, dl, E.ry);
+      }
+      const B = E.mid.clone().add(inset);
+      struct.add(v3(B.x, y0 + FH - .1, B.z), v3(Math.max(.3, E.len - .4), .2, .22), offS, dl, E.ry);
+    });
+    // structure: interior beam grid tying core to perimeter
+    const offG = v3(0, up, 0);
+    [-1.95, 1.95].forEach(z => struct.add(v3(0, y0 + FH - .09, z), v3(2*W - 1.2, .16, .16), offG, dl));
+    [-2.3, 2.3].forEach(x => struct.add(v3(x, y0 + FH - .09, 0), v3(.16, .16, 2*D - 1.2), offG, dl));
+    // outrigger X-bracing on mechanical floors
+    if (f === 11 || f === 23){
+      const run = W - .5 - 2.3, L = Math.hypot(run, FH), a = Math.atan2(FH, run);
+      [-1.95, 1.95].forEach(z => [-1, 1].forEach(s => {
+        const xc = s*(2.3 + run/2);
+        struct.add(v3(xc, y0 + FH/2, z), v3(L, .1, .1), offG, dl, 0, 0, a);
+        struct.add(v3(xc, y0 + FH/2, z), v3(L, .1, .1), offG, dl, 0, 0, -a);
+      }));
+    }
+    // concrete core walls around the lift bank
+    const offC = v3(0, up, -3);
+    core.add(v3(0, y0 + FH/2, -1.08), v3(3.8, FH, .12), offC, .02);
+    core.add(v3(-1.9, y0 + FH/2, -.55), v3(.12, FH, 1.06), offC, .02);
+    core.add(v3(1.9, y0 + FH/2, -.55), v3(.12, FH, 1.06), offC, .02);
+    // Starbucks Korea office floors: desks + green chairs
+    if (isHQ){
+      for (let x = -3.9; x <= 3.95; x += 1.3){
+        [2.45, -2.45].forEach(z => {
+          if (Math.abs(x) > 3.2 && Math.abs(z) > 2) return;
+          desks.add(v3(x, y0 + .36, z), v3(1.1, .05, .55), v3(0, up, 0), dl*.5);
+          chairs.add(v3(x - .25, y0 + .22, z + (z > 0 ? .45 : -.45)), v3(.24, .3, .24), v3(0, up, 0), dl*.5);
+          chairs.add(v3(x + .25, y0 + .22, z + (z > 0 ? -.45 : .45)), v3(.24, .3, .24), v3(0, up, 0), dl*.5);
+        });
+      }
+    }
+    // floor slab
+    slabs.add(v3(0, y0, 0), v3(1,1,1), v3(0, up, 0), dl*.5, 0, 0, 0, isHQ ? new THREE.Color(0.8, 1.05, 0.9) : null);
+    // lift shafts (4) at core
+    [-1.35, -.45, .45, 1.35].forEach(x => {
+      [[-.38,-.38],[.38,-.38],[-.38,.38],[.38,.38]].forEach(([a,b]) =>
+        posts.add(v3(x+a, y0 + FH/2, -.55+b), v3(.05, FH, .05), v3(0, up, -7.5), .02));
+      plates.add(v3(x, y0 + .02, -.55), v3(.8, .03, .8), v3(0, up, -7.5), .02);
+    });
+    // stairs at both ends of core
+    [-3.05, 3.05].forEach((sx, si) => {
+      const run = 1.5, rise = FH/2, L = Math.hypot(run, rise), a = Math.atan2(rise, run);
+      const off = v3(si ? 7.5 : -7.5, up, 1.2);
+      stairs.add(v3(sx - .27, y0 + rise/2, .1), v3(.48, .07, L), off, .05, 0, -a);
+      stairs.add(v3(sx + .27, y0 + rise*1.5, .1), v3(.48, .07, L), off, .05, 0, a);
+      stairs.add(v3(sx, y0 + rise, .1 + run/2 + .3), v3(1.02, .07, .6), off, .05);
+      stairs.add(v3(sx, y0, .1 - run/2 - .3), v3(1.02, .07, .6), off, .05);
+    });
+    // risers + branch
+    const pc = [new THREE.Color(0xe07a3a), new THREE.Color(0x4a7fb5), new THREE.Color(0xb9c0c4)];
+    [-.7, 0, .7].forEach((x,i) => pipes.add(v3(x, y0 + FH/2, 1.55), v3(.1, FH, .1), v3(0, up, 5), .08, 0, 0, 0, pc[i]));
+    if (f % 2 === 0) pipes.add(v3(0, y0 + FH - .14, 1.85), v3(.06, 7.2, .06), v3(0, up, 5), .08, 0, 0, Math.PI/2, pc[f % 4 ? 1 : 0]);
+  }
+  // slab geometry
+  const shape = new THREE.Shape();
+  footprint(W - .12, D - .12, C - .05).forEach(([x,z],i) => i ? shape.lineTo(x, z) : shape.moveTo(x, z));
+  const sg = new THREE.ExtrudeGeometry(shape, { depth:.13, bevelEnabled:false });
+  sg.rotateX(Math.PI/2); sg.translate(0, .02, 0);
+  slabs.geo = sg;
+  slabs.add(v3(0, H, 0), v3(1,1,1), v3(0, H*SP, 0), 0);
+
+  // crown: tall roof fins + band
+  edges.forEach(E => {
+    const n = Math.max(1, Math.round(E.len / 1.1));
+    const out = E.n.clone().multiplyScalar(2.2 + E.seg*1.6).setY(H*SP + 1.5);
+    for (let j = 0; j < n; j++){
+      const Q = E.A.clone().addScaledVector(E.dir, j*E.len/n).addScaledVector(E.n, .05);
+      frame.add(v3(Q.x, H + .8, Q.z), v3(.07, 1.6, .16), out, 0, E.ry);
+    }
+    const S = E.mid.clone().addScaledVector(E.n, .05);
+    frame.add(v3(S.x, H + 1.62, S.z), v3(E.len + .02, .1, .2), out, 0, E.ry);
+  });
+
+  const all = [glass, lit, frame, fins, struct, core, desks, chairs, slabs, posts, plates, stairs, pipes];
+  if (hq.length){ const top = Math.max(...hq) * FH - .02; all.forEach(p => p.items.forEach(it => { if (it.pos.y >= top) it.hq = HQ.lift; })); }
+  all.filter(p => p.items.length).forEach(p => allParts.push(p.build(g)));
+
+  // glass entrance lobby + canopy with gold light lines (as at the real Centerfield entrances)
+  const lob = new THREE.Group(); lob.position.set(0, 0, D);
+  const lw = 6, lh = 3.1, ld = 1.5;
+  const lg = new THREE.Mesh(BOX, M.lobby); lg.scale.set(lw, lh, ld); lg.position.set(0, lh/2, ld/2); lob.add(lg);
+  for (let i = 0; i <= 10; i++){ const m = new THREE.Mesh(BOX, M.fin); m.scale.set(.05, lh, .08); m.position.set(-lw/2 + i*lw/10, lh/2, ld); lob.add(m); }
+  [1.05, 2.1].forEach(y => { const m = new THREE.Mesh(BOX, M.fin); m.scale.set(lw, .04, .08); m.position.set(0, y, ld); lob.add(m); });
+  const door = new THREE.Mesh(BOX, M.dark); door.scale.set(1.6, 1, .06); door.position.set(0, .5, ld + .02); lob.add(door);
+  const cw = 7.4, cd = 3.2, cy = lh + .12;
+  const can = new THREE.Mesh(BOX, M.dark); can.scale.set(cw, .26, cd); can.position.set(0, cy, cd/2 - .2); can.castShadow = true; lob.add(can);
+  for (let i = 0; i < 13; i++){   // radiating LED lines under the canopy
+    const a = (i - 6) * .16, L = cd / Math.cos(a) * .95;
+    const m = new THREE.Mesh(BOX, M.led); m.scale.set(.035, .02, L); m.rotation.y = a;
+    m.position.set(Math.sin(a)*L/2, cy - .14, Math.cos(a)*L/2 - .1); lob.add(m);
+  }
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(cw*.62, cw*.62/8),
+    new THREE.MeshBasicMaterial({ map:textTexture(['CENTERFIELD', name.toUpperCase()]), toneMapped:false }));
+  sign.position.set(0, cy, cd - .2 + .005); lob.add(sign);
+  g.add(lob);
+
+  // lift cars (animated)
+  const cars = [-1.35, -.45, .45, 1.35].map((x,i) => {
+    const m = new THREE.Mesh(BOX, i === 1 ? mat('lift', { color:0x00704a, roughness:.4 }) : M.car);
+    m.scale.set(.62, .5, .62); m.castShadow = true; g.add(m);
+    return { m, x, from:Math.random()*floors, to:Math.random()*floors, t0:-Math.random()*4, dur:3 + Math.random()*3 };
+  });
+  // lift machine room on roof
+  const mr = new THREE.Mesh(BOX, M.post); mr.scale.set(3.8, .8, 1.2); mr.position.set(0, H + .4, -.55); mr.castShadow = true;
+  g.add(track(mr, v3(0, H*SP, -7.5), .02)); if (hq.length) explodables.at(-1).hq = HQ.lift;
+
+  // rooftop equipment
+  const mep = new THREE.Group(); mep.position.set(0, H + .02, 0);
+  const fans = [];
+  [[-2.4, 1.3], [-.8, 1.6], [.8, 1.6], [2.4, 1.3]].forEach(([x,z]) => {
+    const ct = new THREE.Mesh(CYL, M.mep); ct.scale.set(.62, .9, .62); ct.position.set(x, .45, z); ct.castShadow = true; mep.add(ct);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(.6, .05, 6, 20), M.fan); ring.rotation.x = Math.PI/2; ring.position.set(x, .92, z); mep.add(ring);
+    const fan = new THREE.Group(); fan.position.set(x, .95, z);
+    for (let b = 0; b < 4; b++){ const bl = new THREE.Mesh(BOX, M.fan); bl.scale.set(1.05, .03, .16); bl.rotation.y = b*Math.PI/4; bl.rotation.x = .25; fan.add(bl); }
+    mep.add(fan); fans.push(fan);
+  });
+  [[-3.4,-1.6],[3.4,-1.6]].forEach(([x,z]) => { const a = new THREE.Mesh(BOX, M.mep); a.scale.set(1.4, .7, 1.1); a.position.set(x, .35, z); a.castShadow = true; mep.add(a); });
+  const duct = new THREE.Mesh(BOX, M.mep); duct.scale.set(6.4, .28, .3); duct.position.set(0, .55, -1.6); mep.add(duct);
+  [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([a,b]) => { const r = new THREE.Mesh(new THREE.SphereGeometry(.13, 10, 8), M.red); r.position.set(a*(W - 1.2), 1.75, b*(D - 1)); mep.add(r); });
+  g.add(track(mep, v3(0, H*SP + 6, 0), 0)); if (hq.length) explodables.at(-1).hq = HQ.lift;
+
+  return { g, H, floors, cars, fans, name };
+}
+
+const west = buildTower({ floors:36, name:'west' });
+const east = buildTower({ floors:35, hq:[20,21,22], name:'east' });
+west.g.position.set(-8.2, 0, 4.2); west.g.rotation.y = 0.08;
+east.g.position.set(8.2, 0, -4.2); east.g.rotation.y = 0.08;
+scene.add(west.g, east.g);
+track(west.g, v3(-6, 0, 4), 0);
+track(east.g, v3(6, 0, -4), 0);
+
+/* ---------- plaza / landscape ---------- */
+const site = new THREE.Group(); scene.add(site);
+const cv = document.createElement('canvas'); cv.width = cv.height = 1024;
+const cx = cv.getContext('2d'); cx.fillStyle = '#f7f7f3'; cx.fillRect(0,0,1024,1024);
+cx.strokeStyle = 'rgba(120,130,120,.13)'; cx.lineWidth = 2;
+for (let i = 0; i <= 1024; i += 42){ cx.beginPath(); cx.moveTo(i,0); cx.lineTo(i,1024); cx.stroke(); cx.beginPath(); cx.moveTo(0,i); cx.lineTo(1024,i); cx.stroke(); }
+const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(1/46, 1/34);
+// site block with an opening that looks down into the B1 Reserve store
+const SX = 23, SZ = 17, SITE_D = 3;
+const HOLE = { x0:-2.6, x1:7, z0:4.6, z1:10.2 }, BH = 2.5;   // B1 store footprint + height
+const siteShape = new THREE.Shape([[-SX,-SZ],[SX,-SZ],[SX,SZ],[-SX,SZ]].map(([x,z]) => new THREE.Vector2(x, -z)));
+siteShape.holes.push(new THREE.Path([[HOLE.x0,HOLE.z0],[HOLE.x0,HOLE.z1],[HOLE.x1,HOLE.z1],[HOLE.x1,HOLE.z0]].map(([x,z]) => new THREE.Vector2(x, -z))));
+const topGeo = new THREE.ShapeGeometry(siteShape); topGeo.rotateX(-Math.PI/2);
+const plazaTop = new THREE.Mesh(topGeo, new THREE.MeshStandardMaterial({ map:tex, roughness:.95 }));
+plazaTop.receiveShadow = true; site.add(plazaTop);
+const skirts = [[0, SZ, 2*SX, .3], [0, -SZ, 2*SX, .3], [SX, 0, .3, 2*SZ], [-SX, 0, .3, 2*SZ]].map(([x, z, sx, sz]) => {
+  const w = new THREE.Mesh(BOX, M.plaza); w.scale.set(sx, SITE_D, sz); w.position.set(x, -SITE_D/2, z); site.add(w); return w;
+});
+shadowPlane.position.y = -SITE_D - .02;
+
+/* ---------- B1 · Starbucks Centerfield Reserve (cutaway) ---------- */
+const store = new THREE.Group(); site.add(store);
+const SW = HOLE.x1 - HOLE.x0, SD = HOLE.z1 - HOLE.z0, SCX = (HOLE.x0 + HOLE.x1)/2, SCZ = (HOLE.z0 + HOLE.z1)/2, FY = -BH;
+const put = (m, sx, sy, sz, x, y, z, parent = store) => { const o = new THREE.Mesh(BOX, m); o.scale.set(sx, sy, sz); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; parent.add(o); return o; };
+const cyl = (m, r, h, x, y, z) => { const o = new THREE.Mesh(CYL, m); o.scale.set(r, h, r); o.position.set(x, y, z); o.castShadow = true; store.add(o); return o; };
+// shell: stone floor, brushed bronze walls, gold ceiling edge
+put(M.stone, SW, .1, SD, SCX, FY - .05, SCZ);
+const WH = BH - .015;   // walls stop just under the plaza surface (no coplanar faces)
+put(M.bronze, SW + .24, WH, .12, SCX, FY + WH/2, HOLE.z0 - .06);
+put(M.bronze, SW + .24, WH, .12, SCX, FY + WH/2, HOLE.z1 + .06);
+put(M.bronze, .12, WH, SD, HOLE.x1 + .06, FY + WH/2, SCZ);
+put(M.walnut, .12, WH, SD, HOLE.x0 - .06, FY + WH/2, SCZ);
+[[SW, .55, SCX, HOLE.z0 + .27], [SW, .55, SCX, HOLE.z1 - .27]].forEach(([sx, sz, x, z]) => put(M.gold, sx, .14, sz, x, -.2, z));
+[[.55, HOLE.x0 + .27], [.55, HOLE.x1 - .27]].forEach(([sx, x]) => put(M.gold, sx, .13, SD - 1.14, x, -.205, SCZ));
+// sculpted walnut wave wall (left)
+{
+  const rows = 9, cols = 34, slats = new THREE.InstancedMesh(BOX, M.walnut, rows*cols), mx = new THREE.Matrix4();
+  let k = 0;
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++){
+    const depth = .05 + .2 * (Math.sin(c*.33 + r*.55) * .5 + .5);
+    mx.compose(v3(HOLE.x0 + depth/2, FY + .25 + r*(BH - .6)/rows + .1, HOLE.z0 + .3 + c*(SD - .6)/cols),
+      new THREE.Quaternion(), v3(depth, (BH - .6)/rows - .03, (SD - .6)/cols - .03));
+    slats.setMatrixAt(k++, mx);
+  }
+  slats.castShadow = slats.receiveShadow = true; store.add(slats);
+}
+// backlit siren on the back wall, Reserve mark on the right wall
+const siren = new THREE.Mesh(new THREE.CircleGeometry(.62, 48), new THREE.MeshBasicMaterial({ map:TEX.siren, transparent:true, toneMapped:false }));
+siren.position.set(SCX - 1.6, FY + 1.55, HOLE.z0 + .01); store.add(siren);
+const halo = new THREE.Mesh(new THREE.TorusGeometry(.68, .03, 8, 48), M.gold); halo.position.copy(siren.position); store.add(halo);
+put(M.walnut, .06, 1.2, 1.2, HOLE.x1 - .03, FY + 1.5, SCZ - .4);
+const rmark = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map:TEX.reserve, transparent:true }));
+rmark.rotation.y = -Math.PI/2; rmark.position.set(HOLE.x1 - .065, FY + 1.5, SCZ - .4); store.add(rmark);
+// long caramel leather banquette + round walnut tables
+put(M.leather, SW - 2.2, .42, .62, SCX + .5, FY + .21, HOLE.z0 + .38);
+put(M.leather, SW - 2.2, .62, .16, SCX + .5, FY + .55, HOLE.z0 + .1);
+for (let i = 0; i < 6; i++){
+  const x = HOLE.x0 + 1.9 + i*1.15;
+  cyl(M.walnut, .3, .05, x, FY + .72, HOLE.z0 + 1.25); cyl(M.black, .035, .7, x, FY + .35, HOLE.z0 + 1.25);
+  cyl(M.leather, .2, .42, x, FY + .21, HOLE.z0 + 1.85);
+}
+// lounge armchairs by the wave wall
+[[HOLE.x0 + 1.1, SCZ + .6], [HOLE.x0 + 1.1, SCZ + 1.7], [HOLE.x0 + 2.2, SCZ + 1.15]].forEach(([x, z]) => {
+  put(M.leather, .7, .42, .7, x, FY + .21, z); put(M.leather, .7, .35, .14, x - .28, FY + .55, z).rotation.y = Math.PI/2;
+});
+cyl(M.marble, .32, .05, HOLE.x0 + 2.05, FY + .45, SCZ + .55);
+// marble coffee bar with bronze base, brew equipment and pendants
+const barX = SCX + 1.9, barZ = HOLE.z1 - 1.55;
+put(M.marble, 4, .95, .8, barX, FY + .52, barZ);
+put(M.bronze, 4.02, .12, .82, barX, FY + .06, barZ);
+put(M.walnut, 4.4, .9, .5, barX, FY + .45, HOLE.z1 - .3);
+put(M.bronze, 4.4, .06, .52, barX, FY + .93, HOLE.z1 - .3);
+[-1.3, -.4, .5].forEach(dx => put(M.black, .55, .42, .4, barX + dx, FY + 1.2, barZ));
+[1.2, 1.5].forEach(dx => { cyl(M.rail, .09, .4, barX + dx, FY + 1.2, barZ); cyl(M.black, .1, .04, barX + dx, FY + 1.02, barZ); });
+for (let i = 0; i < 5; i++){
+  const x = barX - 1.6 + i*.8;
+  cyl(M.black, .008, .9, x, -.75, barZ);
+  const b = new THREE.Mesh(new THREE.SphereGeometry(.12, 16, 12), M.bulb); b.position.set(x, -1.25, barZ); store.add(b);
+}
+const warm = new THREE.PointLight(0xffd29a, 9, 12, 1.6); warm.position.set(SCX, -.6, SCZ); store.add(warm);
+// glass guard rail around the opening
+[[SW, HOLE.z0, 0], [SW, HOLE.z1, 0], [SD, HOLE.x0, 1], [SD, HOLE.x1, 1]].forEach(([len, p, side]) => {
+  const gx = side ? p : SCX, gz = side ? SCZ : p;
+  put(M.rail, side ? .03 : len, .9, side ? len : .03, gx, .45, gz, site);
+  put(M.fin, side ? .06 : len, .05, side ? len : .06, gx, .92, gz, site);
+});
+
+/* ---------- underground B1–B7 (shown as a section cut in the store close-up) ---------- */
+const LV = [-2.52, -3.32, -4.12, -4.92, -5.72, -6.52, -7.32];   // floor tops of B1..B7
+const BASE_D = 7.75;
+const under = new THREE.Group(); under.visible = false; site.add(under);
+const UM = {
+  slab: new THREE.MeshStandardMaterial({ color:0xc4c8c3, roughness:.9, side:THREE.DoubleSide }),
+  park: new THREE.MeshStandardMaterial({ color:0x5b6266, roughness:.85, side:THREE.DoubleSide }),
+  ceil: new THREE.MeshStandardMaterial({ color:0xdadcd7, roughness:.9, side:THREE.BackSide }),
+  col:  new THREE.MeshStandardMaterial({ color:0xd0d3ce, roughness:.8 }),
+  ramp: new THREE.MeshStandardMaterial({ color:0x7d8589, roughness:.8, side:THREE.DoubleSide }),
+  line: new THREE.MeshBasicMaterial({ color:0xf3f1e6 }),
+  yel:  new THREE.MeshBasicMaterial({ color:0xf2c230 }),
+  lamp: new THREE.MeshBasicMaterial({ color:0xf4f9ff, toneMapped:false }),
+  tank: new THREE.MeshStandardMaterial({ color:0x7aa3bd, roughness:.35, metalness:.45 }),
+  pump: new THREE.MeshStandardMaterial({ color:0x3f7d6a, roughness:.5, metalness:.3 }),
+  pipeO:new THREE.MeshStandardMaterial({ color:0xe07a3a, roughness:.4 }),
+  pipeB:new THREE.MeshStandardMaterial({ color:0x4a7fb5, roughness:.4 }),
+  mall: new THREE.MeshStandardMaterial({ color:0xece7de, roughness:.4 }),
+};
+const uput = (m, sx, sy, sz, x, y, z, shadow = true) => { const o = new THREE.Mesh(BOX, m); o.scale.set(sx, sy, sz); o.position.set(x, y, z); o.castShadow = o.receiveShadow = shadow; under.add(o); return o; };
+// B1 ceiling (the underside of the plaza, with the store opening)
+const ceil = new THREE.Mesh(topGeo, UM.ceil); ceil.position.y = -.04; ceil.castShadow = true; under.add(ceil);
+// floor slabs: B1 concourse, B2–B6 parking, B7 on the foundation mat
+LV.forEach((y, i) => {
+  const last = i === LV.length - 1, t = last ? .43 : .16;
+  uput(i === 0 || last ? UM.slab : UM.park, 2*SX - .35, t, 2*SZ - .35, 0, y - t/2, 0);
+});
+// column grid
+{
+  const pts = [];
+  for (let i = 0; i < LV.length; i++){
+    const top = i === 0 ? -.05 : LV[i - 1] - .16, h = top - LV[i];
+    for (let x = -6; x <= 12.1; x += 3) for (let z = -13; z <= 15; z += 3.5){
+      if (i === 0 && x > HOLE.x0 - .4 && x < HOLE.x1 + .4 && z > HOLE.z0 - .4 && z < HOLE.z1 + .4) continue;
+      pts.push([x, LV[i] + h/2, z, h]);
+    }
+  }
+  const cols = new THREE.InstancedMesh(BOX, UM.col, pts.length), mx = new THREE.Matrix4(), q = new THREE.Quaternion();
+  pts.forEach(([x, y, z, h], i) => cols.setMatrixAt(i, mx.compose(v3(x, y, z), q, v3(.3, h, .3))));
+  cols.castShadow = cols.receiveShadow = true; under.add(cols);
+}
+// parked cars on B2–B6 (rows facing the aisle), bay lines and ceiling light strips
+{
+  const palette = [0xf4f4f2, 0x1d1f22, 0xb9bec3, 0x2c4a6e, 0x8f2a2a, 0x6d7276, 0xe8e2d4];
+  const bodies = [], cabins = [], lines = [];
+  for (let i = 1; i <= 5; i++){
+    const y = LV[i];
+    [9.1, 7.15, 3.6, 1.65].forEach(z => {
+      for (let x = -2.4; x <= 9.6; x += .78){
+        lines.push([x - .39, y + .004, z]);
+        if (Math.random() < .2) continue;
+        const c = new THREE.Color(palette[Math.floor(Math.random()*palette.length)]);
+        bodies.push([x, y + .15, z, c]); cabins.push([x, y + .33, z + (z === 9.1 || z === 3.6 ? .08 : -.08), c]);
+      }
+    });
+  }
+  const mk = (list, scale, m, colors) => {
+    const im = new THREE.InstancedMesh(BOX, m, list.length), mx = new THREE.Matrix4(), q = new THREE.Quaternion();
+    list.forEach((p, i) => { im.setMatrixAt(i, mx.compose(v3(p[0], p[1], p[2]), q, scale)); if (colors) im.setColorAt(i, p[3]); });
+    im.castShadow = im.receiveShadow = !!colors; under.add(im); return im;
+  };
+  mk(bodies, v3(.5, .2, .95), new THREE.MeshStandardMaterial({ roughness:.35, metalness:.5 }), true);
+  mk(cabins, v3(.44, .17, .5), new THREE.MeshStandardMaterial({ roughness:.15, metalness:.6 }), true);
+  mk(lines, v3(.025, .006, .95), UM.line, false);
+  // ceiling light strips on every level
+  const strips = [];
+  LV.forEach((y, i) => {
+    const ceilY = (i === 0 ? -.05 : LV[i - 1] - .16) - .03;
+    for (let x = -4.5; x <= 11; x += 2.6) [8.1, 5.2, 2.6].forEach(z => strips.push([x, ceilY, z]));
+  });
+  mk(strips, v3(1.6, .03, .09), UM.lamp, false);
+}
+// car ramps B2→B6 (zig-zag, on the left of the section)
+for (let i = 1; i < LV.length - 2; i++){
+  const run = 4.6, rise = LV[i] - LV[i + 1], L = Math.hypot(run, rise), a = Math.atan2(rise, run);
+  const r = uput(UM.ramp, 1.1, .12, L, -3.35, (LV[i] + LV[i + 1])/2 - .06, 7.1);
+  r.rotation.x = (i % 2 ? 1 : -1) * a;
+  uput(UM.yel, .04, .01, L * .96, -3.35 + .5, (LV[i] + LV[i + 1])/2 + .005, 7.1, false).rotation.x = r.rotation.x;
+}
+// B1 concourse beside the store (The Shops at Centerfield): shopfronts + polished floor strip
+uput(UM.mall, 2*SX - .4, .02, 3, 0, LV[0] + .01, HOLE.z1 + 2.2);
+[[HOLE.x1 + 1.1, 'r'], [HOLE.x0 - 1.1, 'l']].forEach(([x]) => {
+  uput(M.rail, .05, 2.2, 3.2, x, LV[0] + 1.1, SCZ, false);
+  uput(M.gold, .1, .18, 3.2, x, LV[0] + 2.2, SCZ);
+});
+// B7: plant room — water tanks, pumps, main pipe runs
+[0, 1.4, 2.8, 4.2].forEach(x => {
+  const t = new THREE.Mesh(CYL, UM.tank); t.scale.set(.5, .55, .5); t.position.set(x, LV[6] + .28, 8.6); t.castShadow = true; under.add(t);
+});
+[5.8, 6.7].forEach(x => uput(UM.pump, .55, .32, .45, x, LV[6] + .16, 8.8));
+[[UM.pipeO, 9.5], [UM.pipeB, 9.75]].forEach(([m, z]) => {
+  const p = new THREE.Mesh(CYL, m); p.scale.set(.07, 14, .07); p.rotation.z = Math.PI/2; p.position.set(2.5, LV[5] - .32, z); under.add(p);
+});
+
+// low-rise canopy between the towers
+const canopy = new THREE.Group();
+const roof = new THREE.Mesh(BOX, M.white); roof.scale.set(9, .16, 5.2); roof.position.y = 3.3; roof.castShadow = roof.receiveShadow = true; canopy.add(roof);
+const fascia = new THREE.Mesh(BOX, M.frame); fascia.scale.set(9.05, .06, 5.25); fascia.position.y = 3.2; canopy.add(fascia);
+[[-4,-2.2],[4,-2.2],[-4,2.2],[4,2.2],[0,-2.2],[0,2.2]].forEach(([x,z]) => { const c = new THREE.Mesh(CYL, M.white); c.scale.set(.09, 3.3, .09); c.position.set(x, 1.65, z); c.castShadow = true; canopy.add(c); });
+canopy.rotation.y = -0.42; site.add(canopy);
+
+// trees
+const treeGeo = new THREE.IcosahedronGeometry(1, 0);
+function tree(x, z, s = 1){
+  const t = new THREE.Group(); t.position.set(x, 0, z);
+  const tr = new THREE.Mesh(CYL, M.trunk); tr.scale.set(.09*s, 1.3*s, .09*s); tr.position.y = .65*s; t.add(tr);
+  [[0,1.75,0,.75],[.35,1.45,.2,.5],[-.3,1.5,-.15,.5]].forEach(([a,b,c,r]) => {
+    const l = new THREE.Mesh(treeGeo, M.tree); l.scale.setScalar(r*s); l.position.set(a*s, b*s, c*s); l.rotation.set(Math.random(), Math.random(), 0); t.add(l);
+  });
+  t.traverse(o => { if (o.isMesh) o.castShadow = true; });
+  site.add(t);
+}
+for (let i = 0; i < 9; i++) tree(-20 + i*2.4 + (i > 3 ? 6 : 0), 15 + (i%2)*.4, .95 + Math.random()*.2);
+for (let i = 0; i < 7; i++) tree(21 - (i%2)*.4, 14 - i*2.6, .95 + Math.random()*.2);
+for (let i = 0; i < 6; i++) tree(5 + i*2.6, -15 + (i%2)*.3, .95);
+[[-20,4],[-20,1],[2,-9],[-6,-12]].forEach(([x,z]) => tree(x, z, 1.1));
+// lamp posts with light pools (they glow at night)
+const poolTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d');
+  const g = x.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, 'rgba(255,214,150,1)'); g.addColorStop(1, 'rgba(255,214,150,0)');
+  x.fillStyle = g; x.fillRect(0, 0, 128, 128); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+const poolMat = new THREE.MeshBasicMaterial({ map:poolTex, transparent:true, opacity:0, depthWrite:false, blending:THREE.AdditiveBlending, toneMapped:false });
+[[-14,13.5],[-6,13.5],[10,13.5],[18,13.5],[19.5,4],[19.5,-6],[-19.5,-6],[-19.5,8]].forEach(([x, z]) => {
+  const pole = new THREE.Mesh(CYL, M.dark); pole.scale.set(.05, 2.6, .05); pole.position.set(x, 1.3, z); pole.castShadow = true; site.add(pole);
+  const b = new THREE.Mesh(new THREE.SphereGeometry(.16, 12, 10), M.bulb); b.position.set(x, 2.65, z); site.add(b);
+  const pool = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), poolMat); pool.rotation.x = -Math.PI/2; pool.position.set(x, .02, z); site.add(pool);
+});
+// benches
+[[-3,11],[3,11],[-15,-2],[-15,2]].forEach(([x,z]) => { const b = new THREE.Mesh(BOX, M.white); b.scale.set(2, .35, .5); b.position.set(x, .18, z); b.castShadow = true; site.add(b); });
+
+/* ---------- UI state ---------- */
+const $ = id => document.getElementById(id);
+const state = { e:0, target:0, focus:'all', dragging:false, tour:null, view:'home' };
+const range = $('range'), pct = $('pct');
+const tabs = [...document.querySelectorAll('#tabs button')];
+const catBtns = [...document.querySelectorAll('#cats button')];
+
+function setTarget(v, fromUser = true){ state.target = clamp01(v); if (fromUser) stopTour(); }
+function setFocus(f){ state.focus = f; catBtns.forEach(b => b.classList.toggle('on', b.dataset.f === f)); }
+
+range.addEventListener('input', () => { state.dragging = true; setTarget(range.value/100); });
+range.addEventListener('change', () => state.dragging = false);
+tabs.forEach(b => b.addEventListener('click', () => { setTarget(+b.dataset.t); if (+b.dataset.t < .9) setFocus('all'); }));
+catBtns.forEach(b => b.addEventListener('click', () => { stopTour(); setFocus(b.dataset.f); }));
+$('cta').addEventListener('click', () => setTarget(1));
+
+$('tRotate').addEventListener('click', e => { controls.autoRotate = !controls.autoRotate; e.currentTarget.classList.toggle('on', controls.autoRotate); });
+const dolly = k => { const t = controls.target; const d = camera.position.clone().sub(t); const L = THREE.MathUtils.clamp(d.length()*k, controls.minDistance, controls.maxDistance); camera.position.copy(t).add(d.setLength(L)); };
+$('tIn').addEventListener('click', () => dolly(.82));
+$('tOut').addEventListener('click', () => dolly(1.2));
+let camAnim = null;
+const flyTo = (pos, target, dur = 1.6) => { camAnim = { t:0, dur, p0:camera.position.clone(), q0:controls.target.clone(), p1:pos.clone(), q1:target.clone() }; };
+// close-up views: B1 Reserve store and the Starbucks Korea office floors
+const VIEWS = {
+  store:{ enter(){ setTarget(0, false); setFocus('all'); },
+          get(){ const phone = innerWidth < 700;   // desktop: shift the section left of the side panel; phone: centre it above the card strip
+            const c = v3((HOLE.x0 + HOLE.x1)/2 + (phone ? 1.2 : 4.6), phone ? -5.2 : -4, HOLE.z1 - 1.6); return { target:c, pos:c.clone().add(v3(9, 8.5, 23)) }; },
+          cap:['스타벅스 센터필드R점', '이스트 타워 B1 · 브론즈 벽과 금빛 천장의 리저브 매장', '매장 사진을 참고해 재구성한 인테리어 · 실제 배치와 다를 수 있습니다'] },
+  hq:   { enter(){ setTarget(0, false); setFocus('hq'); },
+          // the floors above 22F lift off, so look down onto the open office floor
+          get(){ const c = east.g.localToWorld(v3(0, 21*FH, 0)); return { target:c, pos:c.clone().add(v3(12, 13.5, 14)) }; },
+          cap:['스타벅스 코리아', '이스트 타워 20–22F · 커피를 기획하는 사람들의 층', '2025년 5월 센터필드로 이전 · 사무 공간 배치는 예술적으로 재구성했습니다'] },
+};
+function setView(name){
+  stopTour(); state.view = name; capIdx = -1;
+  document.body.classList.toggle('closeup', name !== 'home');
+  document.body.classList.toggle('view-store', name === 'store');
+  openMenu(name === 'store');
+  if (name === 'home'){ setTarget(0, false); setFocus('all'); flyTo(fitPos(HOME.pos, HOME.target), HOME.target, 1.4); return; }
+  const v = VIEWS[name]; v.enter(); const { pos, target } = v.get(); flyTo(fitPos(pos, target), target);
+}
+$('tReset').addEventListener('click', () => setView('home'));
+$('back').addEventListener('click', () => setView('home'));
+$('tagStore').addEventListener('click', () => setView('store'));
+$('tagHQ').addEventListener('click', () => setView('hq'));
+$('toStore').addEventListener('click', () => setView('store'));
+$('tFull').addEventListener('click', () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.());
+$('openInfo').addEventListener('click', () => $('modal').classList.add('open'));
+$('closeInfo').addEventListener('click', () => $('modal').classList.remove('open'));
+$('modal').addEventListener('click', e => { if (e.target.id === 'modal') $('modal').classList.remove('open'); });
+addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if ($('modal').classList.contains('open')) $('modal').classList.remove('open');
+  else if (state.view !== 'home') setView('home');
+});
+renderer.domElement.addEventListener('pointerdown', () => { $('hint').style.opacity = 0; if (state.tour) stopTour(); });
+
+/* ---------- auto tour (36s) ---------- */
+const TOUR = 36;
+const ringFg = $('ringFg');
+const ICON_PLAY = $('playIco').innerHTML;
+const ICON_PAUSE = '<svg viewBox="0 0 14 14"><rect x="3" y="2" width="2.6" height="10"/><rect x="8.4" y="2" width="2.6" height="10"/></svg>';
+function startTour(){ state.tour = { t0:performance.now() }; controls.autoRotate = true; $('playIco').innerHTML = ICON_PAUSE; $('playT').textContent = '둘러보는 중'; }
+function stopTour(){
+  if (!state.tour) return;
+  state.tour = null; controls.autoRotate = $('tRotate').classList.contains('on'); controls.autoRotateSpeed = .9;
+  $('playIco').innerHTML = ICON_PLAY; $('playT').textContent = '자동으로 둘러보기'; ringFg.style.strokeDashoffset = 119.4;
+}
+$('play').addEventListener('click', () => state.tour ? stopTour() : startTour());
+function tourTick(t){
+  const seq = ['glass','struct','slab','lift','stair','mep'];
+  controls.autoRotateSpeed = 1.6;
+  if (t < 7){ state.target = 0; setFocus('all'); }
+  else if (t < 13){ state.target = .55; }
+  else if (t < 17){ state.target = 1; }
+  else if (t < 27){ setFocus(seq[Math.min(5, Math.floor((t - 17)/(10/6)))]); }
+  else if (t < 30){ setFocus('all'); }
+  else { state.target = 0; }
+  ringFg.style.strokeDashoffset = 119.4 * (1 - t/TOUR);
+  if (t >= TOUR) stopTour();
+}
+
+/* ---------- captions ---------- */
+const CAPS = [
+  [0,   '외관의 리듬', '센터필드 · 사선으로 놓인 두 개의 탑', '공개 사진과 기사를 바탕으로 재구성한 건축 시각화'],
+  [.25, '세 개의 면, 한 겹의 유리', '청회색 커튼월이 세 방향으로 갈라집니다', '유리와 프레임은 면마다 다른 거리로 펼쳐집니다'],
+  [.75, '그 안의 작은 세계', '승강기, 계단, 배관과 팬까지 서로 다른 움직임', '내부 구조와 분해 동작은 예술적으로 재구성했습니다'],
+];
+let capIdx = -1;
+function updateCaption(e){
+  let i = 0; CAPS.forEach((c, k) => { if (e >= c[0]) i = k; });
+  const key = state.view !== 'home' ? state.view : i;
+  if (key === capIdx) return; capIdx = key;
+  const txt = state.view !== 'home' ? VIEWS[state.view].cap : CAPS[i].slice(1);
+  const T = $('capT'), S = $('capS');
+  T.style.opacity = S.style.opacity = 0;
+  setTimeout(() => { T.textContent = txt[0]; S.textContent = txt[1]; $('foot').textContent = txt[2]; T.style.opacity = S.style.opacity = 1; }, 250);
+}
+
+/* ---------- tags ---------- */
+const tags = [
+  { el:$('tagHQ'), tw:east, local:v3(W + .1, 21*FH, -D + 1.6), floor:21 },
+  { el:$('tagW'), tw:west, local:v3(-W + .4, 36*FH + 1.8, 0), floor:37 },
+  { el:$('tagE'), tw:east, local:v3(W - .4, 35*FH + 1.8, 0), floor:36 },
+  { el:$('tagStore'), tw:null, local:v3(HOLE.x1 - 1.2, -.9, (HOLE.z0 + HOLE.z1)/2), floor:0 },
+];
+function updateTags(e){
+  const k = kOf(e, 0);
+  tags.forEach(t => {
+    V.copy(t.local); V.y = t.local.y + (t.floor*FH*SP)*k;
+    if (t.tw) t.tw.g.localToWorld(V); V.project(camera);
+    const x = (V.x*.5 + .5)*innerWidth, y = (-V.y*.5 + .5)*innerHeight;
+    const w = t.el.offsetWidth, flip = x + w > innerWidth - 8;
+    t.el.classList.toggle('flip', flip);
+    t.el.style.transform = `translate(${flip ? x - w + 5 : x - 5}px, ${y - 12}px)`;
+    const id = t.el.id;
+    const vis = V.z < 1 && (id === 'tagHQ' ? (state.focus === 'all' || state.focus === 'slab' || state.focus === 'glass' || state.focus === 'hq')
+      : id === 'tagStore' ? state.focus === 'all' : e < .3);
+    t.el.style.opacity = vis ? 1 : 0;
+    t.el.style.pointerEvents = vis && t.el.dataset.view ? 'auto' : 'none';
+    t.el.classList.toggle('active', state.view === t.el.dataset.view);
+  });
+}
+
+/* ---------- day / night ---------- */
+const NIGHT = { v:0, target:0 };
+const lerp = THREE.MathUtils.lerp, col = h => new THREE.Color(h);
+const LOOK = {
+  day:  { sky:col(0xffffff), ground:col(0xd9ddd5), sun:col(0xfff6ea) },
+  night:{ sky:col(0x6f86ad), ground:col(0x161d22), sun:col(0xa8bcff) },
+};
+const envBase = new Map();
+scene.traverse(o => [].concat(o.material || []).forEach(m => { if (m && 'envMapIntensity' in m && !envBase.has(m)) envBase.set(m, m.envMapIntensity); }));
+M.lobby.emissive.setHex(0xffc98a);
+function applyNight(n, t){
+  hemi.intensity = lerp(1.15, .32, n);
+  hemi.color.lerpColors(LOOK.day.sky, LOOK.night.sky, n);
+  hemi.groundColor.lerpColors(LOOK.day.ground, LOOK.night.ground, n);
+  sun.intensity = lerp(1.9, .5, n);
+  sun.color.lerpColors(LOOK.day.sun, LOOK.night.sun, n);
+  shadowPlane.material.opacity = lerp(.13, .3, n);
+  envBase.forEach((b, m) => m.envMapIntensity = b * lerp(1, .2, n));
+  warm.intensity = lerp(9, 20, n);
+  M.lobby.emissiveIntensity = .55 * n;
+  M.bulb.emissiveIntensity = lerp(.7, 3.2, n);
+  poolMat.opacity = .6 * n;
+  M.red.opacity = n * (Math.sin(t * 2.6) > .55 ? 1 : .12);      // aviation lights blink
+  const winOn = state.focus === 'all' || state.focus === 'glass';
+  M.win.opacity = n * (winOn ? .95 : .04);
+}
+const ICON_MOON = '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>';
+const ICON_SUN = '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>';
+function setNight(on){
+  NIGHT.target = on ? 1 : 0;
+  document.body.classList.toggle('night', on);
+  $('tNight').classList.toggle('on', on);
+  $('nightIco').innerHTML = on ? ICON_SUN : ICON_MOON;
+  $('tNight').title = on ? '낮으로 전환' : '밤으로 전환';
+  try { localStorage.setItem('sbk-night', on ? '1' : '0'); } catch {}
+}
+$('tNight').addEventListener('click', () => setNight(!NIGHT.target));
+addEventListener('keydown', e => { if ((e.key === 'n' || e.key === 'N') && !e.target.closest('input')) setNight(!NIGHT.target); });
+// stars
+for (let i = 0; i < 90; i++){
+  const st = document.createElement('i');
+  st.style.left = Math.random()*100 + '%'; st.style.top = Math.random()*55 + '%'; st.style.opacity = (.15 + Math.random()*.6).toFixed(2);
+  if (Math.random() < .2) st.style.width = st.style.height = '3px';
+  $('sky').appendChild(st);
+}
+// night is the default; a saved '0' means the viewer chose day
+let startNight = true;
+try { startNight = localStorage.getItem('sbk-night') !== '0'; } catch {}
+setNight(startNight); NIGHT.v = startNight ? 1 : 0;
+
+/* ---------- new-menu panel ---------- */
+// From starbucks.co.kr (2026 Christmas 2 lineup, checked 2026-11-22). Descriptions are short paraphrases.
+const MENU = [
+  { n:'헬로키티 토피 초콜릿', e:'Hello Kitty Toffee Chocolate', d:'고소한 토피와 진한 초콜릿에 레드 리본 무드를 더한 크리스마스 초콜릿 음료', k:335, t:'new', c:['#6e3a2a', '#d24c4c'] },
+  { n:'홀리데이 캐모마일 릴렉서', e:'Holiday Chamomile Relaxer', d:'캐모마일·리치·레몬그라스에 히비스커스 티를 더하고 알로에 토핑을 올린 티 음료', k:220, t:'new', c:['#e47f86', '#f7cfc2'] },
+  { n:'살구 조이풀 메들리 티 라떼', e:'Apricot Joyful Medley Tea Latte', d:'블랙·자스민 그린·우롱 블렌드 티에 살구 풍미를 담은 부드러운 티 라떼', k:300, t:'new', c:['#e3a05e', '#f6e1c6'] },
+  { n:'호지 글레이즈드 티 라떼', e:'Hoji Glazed Tea Latte', d:'국내산 호지차 라떼 위에 치즈 풍미의 글레이즈드 폼을 올린 음료', k:295, t:'new', c:['#966343', '#f1e5d0'] },
+  { n:'퓨어 말차', e:'Pure Malcha', d:'차광 재배한 제주산 녹찻잎을 곱게 갈아 물에 풀어낸 깔끔한 말차', k:11, t:'new', c:['#5c8d3c', '#a9c97c'] },
+  { n:'말차 글레이즈드 티 라떼', e:'Malcha Glazed Tea Latte', d:'쌉싸름한 말차와 달콤한 글레이즈드 소스가 어우러진 티 라떼', k:310, t:'season', c:['#7aa557', '#f1ead8'] },
+  { n:'클래식 뱅쇼 히비스커스 티', e:'Classic Vin Chaud Hibiscus Tea', d:'레드 와인 베이스와 히비스커스 티로 만든 카페인 프리 뱅쇼, 절인 과일 토핑', k:210, t:'season', c:['#741d2c', '#b4404e'] },
+  { n:'윈터 스카치 바닐라 라떼', e:'Winter Scotch Vanilla Latte', d:'버터 스카치 소스와 커피 크림, 진한 에스프레소의 겨울 라떼', k:285, t:'ret', c:['#ad743d', '#f3e4cb'] },
+  { n:'토피 넛 라떼', e:'Toffee Nut Latte', d:'은은한 토피와 고소한 견과 풍미에 브라운 토피 넛 토핑', k:285, t:'ret', c:['#9c6539', '#f0dfc4'] },
+  { n:'블랙 글레이즈드 라떼', e:'Black Glazed Latte', d:'짙은 커피 위에 달콤하고 부드러운 글레이즈드 폼', k:345, t:'ret', c:['#3a2a22', '#efe2ce'] },
+];
+const CHIP = { new:'<span class="new">NEW</span>', season:'<span>SEASON</span>', ret:'<span class="ret">돌아온 메뉴</span>' };
+const cup = ([a, b], i) => `<svg viewBox="0 0 44 56" aria-hidden="true"><defs><linearGradient id="cup${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${b}"/><stop offset=".35" stop-color="${b}"/><stop offset=".36" stop-color="${a}"/><stop offset="1" stop-color="${a}"/></linearGradient></defs>
+  <path d="M9 12h26l-3.2 40a2 2 0 0 1-2 1.8H14.2a2 2 0 0 1-2-1.8z" fill="url(#cup${i})"/><path d="M11.6 30h20.8l-.5 7H12.1z" fill="rgba(255,255,255,.85)"/>
+  <rect x="6.5" y="7" width="31" height="6" rx="2.2" fill="#f4f1ea" stroke="rgba(0,0,0,.12)"/><rect x="12" y="3.5" width="20" height="4" rx="1.6" fill="#e7e2d8"/><circle cx="22" cy="33.5" r="2.3" fill="#00704a"/></svg>`;
+$('menuList').innerHTML = MENU.map((m, i) => `<li style="transition-delay:${(.15 + i*.05).toFixed(2)}s">${cup(m.c, i)}<div><b>${m.n}</b><i>${m.e}</i><p>${m.d}</p><div class="chips">${CHIP[m.t]}<span>${m.k} kcal</span></div></div></li>`).join('');
+function openMenu(on){ document.body.classList.toggle('menu-open', on); }
+$('menuX').addEventListener('click', () => openMenu(false));
+$('menuBtn').addEventListener('click', () => openMenu(!document.body.classList.contains('menu-open')));
+
+/* ---------- section cut (store close-up) ---------- */
+// Clips away the plaza + basement in a box in front of the store so B1–B7 read as a section.
+// clipIntersection: a fragment is removed only when it is on the cut side of ALL four planes.
+const CUT = { v:0, k:-1, x0:-4, x1:8.6,
+  planes:[ new THREE.Plane(v3(0, 0, -1), 100), new THREE.Plane(v3(-1, 0, 0), -4), new THREE.Plane(v3(1, 0, 0), -8.6), new THREE.Plane(v3(0, 1, 0), -.03) ] };
+scene.traverse(o => [].concat(o.material || []).forEach(m => { if (m){ m.clippingPlanes = CUT.planes; m.clipIntersection = true; m.clipShadows = true; } }));
+// things standing on the part of the plaza that gets cut away
+const onCut = site.children.filter(o => o !== under && o !== store && o.position.y > -.5 && o.position.z > HOLE.z1 - .3 && o.position.x > CUT.x0 - 2.5 && o.position.x < CUT.x1 + 2.5);
+const LVTAGS = [['lvB1', (LV[0] + 0)/2 - .3], ['lvP', (LV[1] + LV[5])/2 + .3], ['lvB7', LV[6] + .3]];
+function applyCut(dt){
+  CUT.v += ((state.view === 'store' ? 1 : 0) - CUT.v) * Math.min(1, dt * 1.6);
+  if (Math.abs(CUT.v - Math.round(CUT.v)) < .01) CUT.v = Math.round(CUT.v);
+  const k = ease(CUT.v);
+  const zc = THREE.MathUtils.lerp(SZ + 1, HOLE.z1 - .45, k);
+  if (k !== CUT.k){
+    CUT.k = k;
+    CUT.planes[0].constant = k > 0 ? zc : 100;
+    under.visible = k > .01;
+    onCut.forEach(o => o.visible = k < .02);
+    const d = THREE.MathUtils.lerp(SITE_D, BASE_D, Math.min(1, k * 4));   // deepen the plinth first so the basement never pokes out
+    skirts.forEach(w => { w.scale.y = d; w.position.y = -d/2; });
+    shadowPlane.position.y = -d - .02;
+  }
+  LVTAGS.forEach(([id, y]) => {
+    const el = $(id);
+    V.set(CUT.x1 + .15, y, zc).project(camera);
+    const x = (V.x*.5 + .5)*innerWidth, w = el.offsetWidth, flip = x + w > innerWidth - 8;
+    el.classList.toggle('flip', flip);
+    el.style.transform = `translate(${flip ? x - w + 4 : x - 4}px, ${(-V.y*.5 + .5)*innerHeight - 12}px)`;
+    el.style.opacity = k > .92 ? 1 : 0;
+  });
+}
+
+/* ---------- loop ---------- */
+const clock = new THREE.Clock();
+let lastE = -1, firstFrame = true;
+function tick(){
+  const dt = Math.min(clock.getDelta(), .05), now = clock.elapsedTime;
+  if (state.tour) tourTick((performance.now() - state.tour.t0)/1000);
+
+  state.e += (state.target - state.e) * Math.min(1, dt * (state.dragging ? 14 : 2.6));
+  if (Math.abs(state.target - state.e) < 1e-4) state.e = state.target;
+  const e = state.e;
+  applyCut(dt);
+  NIGHT.v += (NIGHT.target - NIGHT.v) * Math.min(1, dt * 1.3);
+  applyNight(NIGHT.v, now);
+  HQ.h += ((state.view === 'hq' ? 1 : 0) - HQ.h) * Math.min(1, dt * 2.4);
+  if (Math.abs(HQ.h - Math.round(HQ.h)) < 1e-4) HQ.h = Math.round(HQ.h);
+  const hk = ease(HQ.h);
+  if (Math.abs(e - lastE) > 1e-5 || hk !== HQ.k){
+    HQ.k = hk;
+    allParts.forEach(p => p.update(e));
+    explodables.forEach(x => { x.obj.position.copy(x.base).addScaledVector(x.off, kOf(e, x.delay)); if (x.hq) x.obj.position.y += x.hq * hk; });
+    lastE = e;
+  }
+  if (!state.dragging) range.value = (e*100).toFixed(1);
+  range.style.setProperty('--p', (e*100) + '%');
+  pct.firstChild.nodeValue = Math.round(e*100);
+  tabs.forEach(b => b.classList.toggle('on', +b.dataset.t === (state.target > .8 ? 1 : state.target > .2 ? .55 : 0)));
+  $('hero').classList.toggle('hide', e > .6);
+  $('cats').classList.toggle('show', e > .6);
+  updateCaption(e);
+
+  // focus fade
+  Object.entries(CAT).forEach(([k, list]) => {
+    const on = state.focus === 'all' || state.focus === k;
+    list.forEach(m => {
+      // 'hq' close-up: floors, desks and chairs only (pipes hidden so they don't block the view)
+      const show = on || (state.focus === 'hq' && k === 'slab' && m !== M.pipe);
+      const goal = show ? m.userData.base : .06;
+      m.opacity += (goal - m.opacity) * Math.min(1, dt*6);
+      m.depthWrite = m.opacity > .5 && !m.userData.seeThrough;
+    });
+  });
+
+  // lifts move, fans spin
+  const kl = kOf(e, .02);
+  [west, east].forEach(tw => {
+    tw.cars.forEach(c => {
+      let u = (now - c.t0) / c.dur;
+      if (u >= 1.4){ c.from = c.to; c.to = Math.floor(Math.random()*tw.floors); c.t0 = now; c.dur = 2.5 + Math.abs(c.to - c.from)*.12; u = 0; }
+      const fl = c.from + (c.to - c.from) * ease(clamp01(u));
+      c.m.position.set(c.x, fl*FH*(1 + SP*kl) + .3, -.55 - 7.5*kl);
+    });
+    tw.fans.forEach((f,i) => f.rotation.y += dt * (4 + i*.7) * (1 + e*2));
+  });
+
+  if (camAnim){
+    camAnim.t = Math.min(1, camAnim.t + dt/camAnim.dur); const k = ease(camAnim.t);
+    controls.target.lerpVectors(camAnim.q0, camAnim.q1, k);
+    // arc the camera a little higher mid-flight so it doesn't clip through the towers
+    camera.position.lerpVectors(camAnim.p0, camAnim.p1, k).y += Math.sin(Math.PI*k) * camAnim.p0.distanceTo(camAnim.p1) * .18;
+    if (camAnim.t >= 1) camAnim = null;
+  }
+  // keep the view centred higher as the building grows
+  const kz = kOf(e, 0);
+  if (!camAnim && state.view === 'home'){
+    controls.target.y += ((5.5 + 9*kz) - controls.target.y) * Math.min(1, dt*2);
+    // ease the camera back as the building spreads, keeping the user's own zoom
+    const s = (1 + .32*kz) / (1 + .32*(tick.kz ?? 0));
+    if (s !== 1) camera.position.sub(controls.target).multiplyScalar(s).add(controls.target);
+  }
+  tick.kz = kz;
+
+  controls.update();
+  renderer.render(scene, camera);
+  updateTags(e);
+  if (firstFrame){ firstFrame = false; setTimeout(() => $('loader').style.opacity = 0, 300); }
+  requestAnimationFrame(tick);
+}
+function fit(){
+  renderer.setSize(innerWidth, innerHeight);
+  camera.aspect = innerWidth/innerHeight;
+  // narrow screens: step back so both towers fit
+  camera.fov = innerWidth < 700 ? 44 : 32;
+  const a = innerWidth / innerHeight;
+  const k = a < 1 ? THREE.MathUtils.clamp(.66 / a, 1, 1.9) : 1;
+  if (k !== FIT.k){ camera.position.sub(controls.target).multiplyScalar(k / FIT.k).add(controls.target); FIT.k = k; }
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', fit); fit();
+tick();
+</script>
+</body>
+</html>
